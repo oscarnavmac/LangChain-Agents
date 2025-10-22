@@ -1,0 +1,49 @@
+{
+  "name": "LangGraph Dev Container",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "reshape",
+  "postCreateCommand": "sudo chown -R reshape .venv && uv sync --frozen --no-cache",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "njpwerner.autodocstring",
+        "oderwat.indent-rainbow",
+        "exiasr.hadolint",
+        "GitHub.copilot",
+        "ms-python.python",
+        "tamasfe.even-better-toml",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": ["source.organizeImports"]
+        }
+      }
+    }
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    {
+      "source": "${localWorkspaceFolderBasename}-venv",
+      "target": "/workspace/.venv",
+      "type": "volume"
+    }
+  ]
+}
