@@ -214,6 +214,11 @@ secrets.json
 *.sqlite
 *.sqlite3
 
+# Pickle files (serialized Python objects)
+*.pkl
+*.pickle
+*.pckl
+
 # Backup files
 *.bak
 *.backup
