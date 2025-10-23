@@ -2,7 +2,6 @@ from typing import Any
 
 from langchain.agents.middleware import AgentMiddleware, AgentState, hook_config
 from langchain.chat_models import init_chat_model
-from langchain_core.messages import AIMessage
 from langgraph.runtime import Runtime
 from llm_guard import scan_prompt
 from llm_guard.input_scanners import BanTopics, PromptInjection, TokenLimit, Toxicity
@@ -69,31 +68,40 @@ class SafetyOutputGuardrailMiddleware(AgentMiddleware):
         self.safety_model = init_chat_model("openai:gpt-4o-mini")
 
     @hook_config(can_jump_to=["end"])
-    def after_model(self, state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
+    def before_model(
+        self, state: AgentState, runtime: Runtime
+    ) -> dict[str, Any] | None:
         # Get the final AI response
         if not state["messages"]:
             return None
 
-        last_message = state["messages"][-1]
-        if not isinstance(last_message, AIMessage):
+        first_message = state["messages"][-1]
+        if first_message.type != "human":
             return None
 
+        human_input = first_message.content
+
+        print(f"\n\n\n{human_input}\n\n\n")
+
+        if not isinstance(human_input, str):
+            human_input = human_input[-1]["text"]
+
         # Use a model to evaluate safety
-        safety_prompt = f"""Evaluate if this AI-generated response is authorized or not, based on certain guidelines.
-# Scope of accepted responses
-You must accept **only** Yaskawa-related topics responses:
+        safety_prompt = f"""Evaluate if this input must be authorized or not, based on certain guidelines.
+# Scope of accepted inputs
+You must accept **only** Yaskawa-related topic inputs such as:
 - Yaskawa products, models, robots, drives, controllers, or accessories.
 - Technical details, manuals, error codes, specifications, or SKUs.
 - Spare parts (including AR1440).
 - Comparisons **only when a Yaskawa product is involved**.
 - Sales follow-up or contact requests.
-- Normal human-AI interaction such as greetings.
-- Automatic responses such as "I cannot provide a response to that request." and "No Information Found" are acceptable.
+- Greetings are allowed.
 
-# Out-of-Scope topics for responses
-You must reject responses that answered to:
+# Out-of-Scope topics for inputs
+You must reject inputs asking:
 - Personal or sensitive topics: religion, race, gender, sexuality, health or mental health, politics, or personal advice.
 - Coding, software development, or debugging.
+- Generic AI capabilities or functionalities.
 - Legal, medical, or financial advice.
 - Pricing, quotations, or cost estimates.
 - Non-Yaskawa brands.
@@ -102,9 +110,9 @@ You must reject responses that answered to:
 
         Respond with only 'ACCEPT' or 'REJECT'.
 
-        AI-generated Response: {last_message.content}"""
+        Input: {human_input}"""
 
-        print(f"\n\n\nAI Response: {last_message.content}\n\n\n")
+        print(f"\n\n\n{human_input}\n\n\n")
 
         result = self.safety_model.invoke([{"role": "user", "content": safety_prompt}])
 
