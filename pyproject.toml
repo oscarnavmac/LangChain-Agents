@@ -9,4 +9,5 @@ dependencies = [
     "langchain-mcp-adapters>=0.1.11",
     "langchain-openai>=1.0.1",
     "langgraph-cli[inmem]>=0.4.4",
+    "llm-guard>=0.3.16",
 ]

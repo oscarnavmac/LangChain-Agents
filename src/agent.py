@@ -1,10 +1,12 @@
 import asyncio
 
 from langchain.agents import create_agent
-from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
 
-from src.utils.middleware import SafetyGuardrailMiddleware
+from src.utils.middleware import (
+    SafetyInputGuardrailMiddleware,
+    SafetyOutputGuardrailMiddleware,
+)
 from src.utils.tools import get_reshape_mcp_tools
 
 model = ChatOpenAI(model_name="gpt-4.1")
@@ -30,7 +32,10 @@ async def create_agent_with_mcp_tools():
     return create_agent(
         model,
         tools=mcp_tools + [send_email],
-        middleware=[SafetyGuardrailMiddleware()],
+        middleware=[
+            SafetyInputGuardrailMiddleware(),
+            SafetyOutputGuardrailMiddleware(),
+        ],
         system_prompt=read_prompt_from_md("src/Yaskawa_prompt_final.md"),
     )
 
