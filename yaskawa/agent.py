@@ -7,7 +7,7 @@ from yaskawa.utils.middleware import (
     SafetyInputGuardrailMiddleware,
     SafetyOutputGuardrailMiddleware,
 )
-from yaskawa.utils.tools import get_reshape_mcp_tools
+from yaskawa.utils.tools import get_reshape_mcp_tools, send_email, web_search
 
 model = ChatOpenAI(model_name="gpt-4.1")
 
@@ -18,25 +18,17 @@ def read_prompt_from_md(file_path: str) -> str:
         return file.read()
 
 
-def send_email(to: str, subject: str, body: str):
-    """Send an email"""
-    email = {"to": to, "subject": subject, "body": body}
-    # ... email sending logic
-
-    return f"Email sent to {to}"
-
-
 async def create_agent_with_mcp_tools():
     mcp_tools = await get_reshape_mcp_tools("retrieve_documents")
 
     return create_agent(
         model,
-        tools=mcp_tools + [send_email],
+        tools=mcp_tools + [send_email, web_search],
         middleware=[
             SafetyInputGuardrailMiddleware(),
             SafetyOutputGuardrailMiddleware(),
         ],
-        system_prompt=read_prompt_from_md("yaskawa/Yaskawa_prompt_final.md"),
+        system_prompt=read_prompt_from_md("yaskawa/Yaskawa_prompt.md"),
     )
 
 
