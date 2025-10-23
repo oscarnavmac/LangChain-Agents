@@ -3,11 +3,11 @@ import asyncio
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
-from src.utils.middleware import (
+from yaskawa.utils.middleware import (
     SafetyInputGuardrailMiddleware,
     SafetyOutputGuardrailMiddleware,
 )
-from src.utils.tools import get_reshape_mcp_tools
+from yaskawa.utils.tools import get_reshape_mcp_tools
 
 model = ChatOpenAI(model_name="gpt-4.1")
 
@@ -36,7 +36,7 @@ async def create_agent_with_mcp_tools():
             SafetyInputGuardrailMiddleware(),
             SafetyOutputGuardrailMiddleware(),
         ],
-        system_prompt=read_prompt_from_md("src/Yaskawa_prompt_final.md"),
+        system_prompt=read_prompt_from_md("yaskawa/Yaskawa_prompt_final.md"),
     )
 
 
