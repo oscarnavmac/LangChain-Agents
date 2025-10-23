@@ -1,5 +1,5 @@
 {
-  "dependencies": ["./yaskawa"],
+  "dependencies": ["."],
   "graphs": {
     "agent": "./yaskawa/agent.py:agent"
   },

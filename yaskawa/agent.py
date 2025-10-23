@@ -7,7 +7,7 @@ from yaskawa.utils.middleware import (
     SafetyInputGuardrailMiddleware,
     SafetyOutputGuardrailMiddleware,
 )
-from yaskawa.utils.tools import get_reshape_mcp_tools, send_email, web_search
+from yaskawa.utils.tools import get_reshape_mcp_tools, gmail_send_email, web_search
 
 model = ChatOpenAI(model_name="gpt-4.1")
 
@@ -19,11 +19,11 @@ def read_prompt_from_md(file_path: str) -> str:
 
 
 async def create_agent_with_mcp_tools():
-    mcp_tools = await get_reshape_mcp_tools("retrieve_documents")
+    mcp_tools = await get_reshape_mcp_tools(["retrieve_documents"])
 
     return create_agent(
         model,
-        tools=mcp_tools + [send_email, web_search],
+        tools=mcp_tools + [gmail_send_email, web_search],
         middleware=[
             SafetyInputGuardrailMiddleware(),
             SafetyOutputGuardrailMiddleware(),

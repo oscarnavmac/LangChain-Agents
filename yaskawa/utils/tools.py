@@ -1,5 +1,6 @@
 import os
 
+from composio import Composio
 from dotenv import load_dotenv
 from langchain.tools import tool
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -8,13 +9,26 @@ from openai import OpenAI
 load_dotenv()
 
 
-@tool
-def send_email(to: str, subject: str, body: str):
-    """Send an email"""
-    email = {"to": to, "subject": subject, "body": body}
-    # ... email sending logic
+def gmail_send_email(
+    recipient_email: str, body: str, subject: str, is_html: bool = False
+) -> None:
+    """Send an email from Gmail using Composio"""
+    composio = Composio(api_key=os.environ.get("COMPOSIO_API_KEY"))
+    externalUserId = os.environ.get("COMPOSIO_USER_ID")
+    connected_account_id = os.environ.get("COMPOSIO_ACCOUNT_ID")
 
-    return f"Email sent to {to}"
+    return composio.tools.execute(
+        slug="GMAIL_SEND_EMAIL",
+        arguments={
+            "recipient_email": recipient_email,
+            "body": body,
+            "subject": subject,
+            "is_html": is_html,
+        },
+        user_id=externalUserId,
+        version="20251023_00",
+        connected_account_id=connected_account_id,
+    )
 
 
 @tool
