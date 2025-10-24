@@ -35,7 +35,7 @@ def gmail_send_email(
 def web_search(query: str) -> str:
     """Perform a web search using OpenAI models"""
     model = {"name": "gpt-5", "reasoning_effort": "medium"}
-    domains = ["knowledge.motoman.com"]
+    domains = ["knowledge.motoman.com", "www.motoman.com"]
 
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     response = client.responses.create(
